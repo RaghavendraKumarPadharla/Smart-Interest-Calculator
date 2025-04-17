@@ -1,0 +1,22 @@
+# External CDN Dependencies
+chart.js>=4.4.1
+tailwindcss>=3.4.1
+html2canvas>=1.4.1
+jspdf>=2.5.1
+dom-to-image>=2.6.0
+
+# Browser Requirements
+- Modern web browser with JavaScript enabled
+- Minimum screen resolution: 320x568px (iPhone SE)
+- Recommended screen resolution: 1920x1080px or higher
+
+# Development Dependencies (Optional)
+- Node.js >= 14.0.0 (for local development)
+- npm >= 6.0.0 (for package management)
+- Live Server VS Code extension (for local development)
+
+# Notes
+- All dependencies are loaded via CDN in the HTML file
+- No build process required
+- Application runs entirely in the browser
+- Internet connection required for loading CDN resources 

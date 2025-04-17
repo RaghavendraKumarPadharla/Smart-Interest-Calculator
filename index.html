@@ -1,0 +1,2504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💰 Smart Interest Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f0f9ff, #f5f3ff);
+      min-height: 100vh;
+      padding: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    body.dark-mode {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+    }
+    .dark-mode .max-w-2xl {
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(8px);
+    }
+    .dark-mode .text-gray-700 {
+      color: #e2e8f0;
+    }
+    .dark-mode .input-container {
+      background-color: #1e293b;
+      border-color: #334155;
+    }
+    .dark-mode .input-container:hover {
+      background-color: #334155;
+      border-color: #475569;
+    }
+    .dark-mode .input-container:focus-within {
+      background-color: #1e293b;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+    .dark-mode .input-label {
+      color: #e2e8f0;
+    }
+    .dark-mode .input-helper {
+      color: #94a3b8;
+    }
+    .dark-mode .input-field {
+      background-color: #0f172a;
+      border-color: #334155;
+      color: #e2e8f0;
+    }
+    .dark-mode .input-field:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    .dark-mode .input-field::placeholder {
+      color: #64748b;
+    }
+    .dark-mode .section-title {
+      color: #e2e8f0;
+      border-bottom-color: #334155;
+    }
+    .dark-mode .result-text {
+      color: #e2e8f0;
+    }
+    .dark-mode .analysis-title {
+      color: #e2e8f0;
+    }
+    .dark-mode .analysis-subtitle {
+      color: #e2e8f0;
+    }
+    .dark-mode .analysis-text {
+      color: #cbd5e1;
+    }
+    .dark-mode .bg-indigo-50\/50 {
+      background-color: rgba(30, 41, 59, 0.5);
+    }
+    .dark-mode .bg-green-50\/50 {
+      background-color: rgba(30, 41, 59, 0.5);
+    }
+    .dark-mode .chart-container {
+      background: rgba(30, 41, 59, 0.9);
+    }
+    .dark-mode .chart-tab {
+      color: #94a3b8;
+    }
+    .dark-mode .chart-tab.active {
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+    }
+    .dark-mode .reset-btn {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      color: #e2e8f0;
+      border-color: #334155;
+    }
+    .dark-mode .reset-btn:hover {
+      background: linear-gradient(135deg, #334155, #475569);
+    }
+    .dark-mode .download-btn {
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+    }
+    .dark-mode .download-btn:hover {
+      box-shadow: 0 6px 8px rgba(59, 130, 246, 0.3);
+    }
+    .dark-mode footer {
+      color: #94a3b8;
+    }
+    /* Dark mode toggle button */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      padding: 0.75rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    .theme-toggle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(99, 102, 241, 0.3);
+    }
+    .theme-toggle svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+    .dark-mode .theme-toggle {
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+    }
+    .custom-shadow {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    }
+    /* Text visibility improvements */
+    .input-container {
+      position: relative;
+      margin-bottom: 1.5rem;
+      background-color: #f9fafb;
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      transition: all 0.3s ease;
+      border: 1px solid #e5e7eb;
+    }
+    .input-container:hover {
+      background-color: #f3f4f6;
+      border-color: #d1d5db;
+    }
+    .input-container:focus-within {
+      background-color: #f0f9ff;
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.2);
+    }
+    .input-icon {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.25rem;
+      color: #6b7280;
+      font-size: 1.25rem;
+    }
+    .input-label {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .input-helper {
+      font-size: 0.95rem;
+      color: #4b5563;
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+    .input-field {
+      font-size: 1.1rem;
+      color: #1f2937;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #d1d5db;
+      background-color: white;
+      transition: all 0.2s ease;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.2);
+    }
+    .input-field::placeholder {
+      color: #9ca3af;
+    }
+    .input-group {
+      display: flex;
+      gap: 1rem;
+    }
+    .input-group .input-container {
+      flex: 1;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .result-text {
+      font-size: 1.2rem;
+      color: #1f2937;
+    }
+    .result-value {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+    .analysis-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 1rem;
+    }
+    .analysis-subtitle {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 0.75rem;
+    }
+    .analysis-text {
+      font-size: 1.05rem;
+      color: #374151;
+      line-height: 1.5;
+    }
+    .chart-tab {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    /* Responsive text adjustments */
+    @media (max-width: 640px) {
+      .input-label {
+        font-size: 0.95rem;
+      }
+      .input-helper {
+        font-size: 0.85rem;
+      }
+      .input-field {
+        font-size: 0.95rem;
+        padding: 0.6rem 0.8rem;
+      }
+      .result-text {
+        font-size: 1rem;
+      }
+      .result-value {
+        font-size: 1.1rem;
+      }
+      .analysis-title {
+        font-size: 1.1rem;
+      }
+      .analysis-subtitle {
+        font-size: 1rem;
+      }
+      .analysis-text {
+        font-size: 0.9rem;
+      }
+      .chart-tab {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+      }
+      .chart-container {
+        min-height: 300px;
+        padding: 1rem;
+      }
+      .chart-wrapper {
+        height: 250px;
+      }
+      .download-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+      .download-btn svg {
+        width: 1rem;
+        height: 1rem;
+      }
+      .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+      }
+      .input-container {
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+      .input-group {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .input-group .input-container {
+        width: 100%;
+      }
+      #results, #analysis {
+        padding: 1rem;
+        margin-top: 1rem;
+      }
+      .grid-cols-1 {
+        gap: 0.75rem;
+      }
+      .bg-indigo-50\/50, .bg-green-50\/50 {
+        padding: 0.75rem;
+      }
+    }
+    /* Tablet adjustments */
+    @media (min-width: 641px) and (max-width: 1024px) {
+      .max-w-2xl {
+        max-width: 90%;
+        padding: 1.5rem;
+      }
+      .chart-container {
+        min-height: 400px;
+      }
+      .chart-wrapper {
+        height: 350px;
+      }
+      .input-group {
+        gap: 1rem;
+      }
+      .chart-tab {
+        font-size: 0.9rem;
+        padding: 0.45rem 0.9rem;
+      }
+    }
+    /* Small mobile devices */
+    @media (max-width: 380px) {
+      .text-3xl {
+        font-size: 1.5rem;
+      }
+      .text-base {
+        font-size: 0.9rem;
+      }
+      .input-label {
+        font-size: 0.9rem;
+      }
+      .input-helper {
+        font-size: 0.8rem;
+      }
+      .input-field {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+      }
+      .chart-container {
+        min-height: 250px;
+      }
+      .chart-wrapper {
+        height: 200px;
+      }
+      .chart-tab {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.7rem;
+      }
+    }
+    /* Landscape mode adjustments */
+    @media (max-height: 600px) and (orientation: landscape) {
+      .chart-container {
+        min-height: 200px;
+      }
+      .chart-wrapper {
+        height: 180px;
+      }
+      .input-container {
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+      }
+      .section-title {
+        margin-bottom: 0.5rem;
+      }
+    }
+    .chart-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      -webkit-overflow-scrolling: touch;
+    }
+    .chart-tab {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      font-size: 0.875rem;
+    }
+    .chart-tab.active {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+    }
+    .chart-container {
+      position: relative;
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      min-height: 500px;
+    }
+    .chart-wrapper {
+      display: none;
+      height: 450px;
+    }
+    .chart-wrapper.active {
+      display: block;
+    }
+    /* Input field adjustments */
+    input[type="number"], select {
+      font-size: 1rem;
+      padding: 0.75rem 1rem;
+    }
+    /* Results and Analysis sections */
+    #results, #analysis {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+    }
+    /* Footer adjustments */
+    footer {
+      margin-top: 2rem;
+      font-size: 0.875rem;
+    }
+    /* Reset button styles */
+    .reset-btn {
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      color: #374151;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 1px solid #e5e7eb;
+    }
+    .reset-btn:hover {
+      background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .reset-btn:active {
+      transform: translateY(0);
+    }
+    .reset-btn svg {
+      transition: transform 0.3s ease;
+    }
+    .reset-btn:hover svg {
+      transform: rotate(180deg);
+    }
+    /* Add download button styles */
+    .download-btn {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+    }
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(99, 102, 241, 0.3);
+    }
+    .download-btn:active {
+      transform: translateY(0);
+    }
+    .download-btn svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+    /* Add sidebar styles */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 300px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 2rem;
+      overflow-y: auto;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      visibility: hidden;
+    }
+
+    .sidebar.active {
+      transform: translateX(0);
+      visibility: visible;
+    }
+
+    .sidebar-toggle {
+      position: fixed;
+      top: 4.5rem;
+      right: 1rem;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      padding: 0.75rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .instruction-step {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    .instruction-step:hover {
+      background: rgba(99, 102, 241, 0.15);
+      transform: translateX(5px);
+    }
+
+    .step-number {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 24px;
+      margin-right: 0.5rem;
+      font-weight: 600;
+    }
+
+    .step-title {
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-description {
+      color: #4b5563;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .dark-mode .sidebar {
+      background: rgba(30, 41, 59, 0.95);
+    }
+
+    .dark-mode .sidebar-title {
+      color: #e2e8f0;
+      border-bottom-color: #334155;
+    }
+
+    .dark-mode .instruction-step {
+      background: rgba(99, 102, 241, 0.2);
+    }
+
+    .dark-mode .instruction-step:hover {
+      background: rgba(99, 102, 241, 0.25);
+    }
+
+    .dark-mode .step-title {
+      color: #e2e8f0;
+    }
+
+    .dark-mode .step-description {
+      color: #94a3b8;
+    }
+
+    @media (max-width: 640px) {
+      .sidebar {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center">
+  <!-- Add sidebar toggle button -->
+  <button id="sidebarToggle" class="sidebar-toggle" title="How to Use">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
+
+  <!-- Add sidebar -->
+  <div id="sidebar" class="sidebar">
+    <h2 class="sidebar-title">How to Use Smart Interest Calculator</h2>
+    
+    <div class="instruction-step">
+      <span class="step-number">1</span>
+      <h3 class="step-title">Enter Investment Details</h3>
+      <p class="step-description">Input your principal amount (initial investment) and the annual interest rate offered by your investment.</p>
+    </div>
+
+    <div class="instruction-step">
+      <span class="step-number">2</span>
+      <h3 class="step-title">Set Time Period</h3>
+      <p class="step-description">Choose between entering the number of years or selecting specific start and end dates for your investment.</p>
+    </div>
+
+    <div class="instruction-step">
+      <span class="step-number">3</span>
+      <h3 class="step-title">Select Interest Type</h3>
+      <p class="step-description">Choose between Simple Interest (calculated only on principal) or Compound Interest (calculated on principal plus accumulated interest).</p>
+    </div>
+
+    <div class="instruction-step">
+      <span class="step-number">4</span>
+      <h3 class="step-title">Choose Compounding Frequency</h3>
+      <p class="step-description">If using Compound Interest, select how often the interest is calculated (Yearly, Half-Yearly, Quarterly, or Monthly).</p>
+    </div>
+
+    <div class="instruction-step">
+      <span class="step-number">5</span>
+      <h3 class="step-title">View Results</h3>
+      <p class="step-description">See your total interest earned and total amount. Explore different charts to visualize your investment growth.</p>
+    </div>
+
+    <div class="instruction-step">
+      <span class="step-number">6</span>
+      <h3 class="step-title">Download Analysis</h3>
+      <p class="step-description">Click the "Download PDF" button to save your complete investment analysis, including all charts and calculations.</p>
+    </div>
+  </div>
+
+  <!-- Add theme toggle button -->
+  <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+  </button>
+
+  <div class="max-w-2xl w-full bg-white/95 backdrop-blur-md rounded-2xl custom-shadow p-8">
+    <div class="text-center mb-8 bg-gradient-to-r from-indigo-600/10 to-purple-600/10 p-6 rounded-xl">
+      <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 mb-3 tracking-tight">
+        Smart Interest Calculator
+      </h1>
+      <p class="text-gray-700 text-lg md:text-xl font-medium">
+        Calculate your investment growth with precision and clarity
+      </p>
+    </div>
+
+    <form id="calculatorForm" class="space-y-6">
+      <div class="section-title">💰 Investment Details</div>
+      
+      <div class="input-container">
+        <label for="principal" class="input-label">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd" />
+          </svg>
+          Principal Amount (₹)
+        </label>
+        <p class="input-helper">Enter the initial amount you want to invest (e.g., 10000)</p>
+        <input type="number" id="principal" required 
+          placeholder="Enter amount in rupees" 
+          class="input-field" 
+          title="The initial amount you want to invest" />
+        <div class="input-icon">₹</div>
+      </div>
+
+      <div class="input-container">
+        <label for="rate" class="input-label">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+          </svg>
+          Rate of Interest (%)
+        </label>
+        <p class="input-helper">Enter the annual interest rate offered (e.g., 8.5)</p>
+        <input type="number" id="rate" required 
+          placeholder="Enter annual interest rate" 
+          class="input-field" 
+          title="The annual interest rate offered by your investment" />
+        <div class="input-icon">%</div>
+      </div>
+
+      <div class="section-title">⏱️ Time Period</div>
+      
+      <div class="input-container">
+        <label for="time" class="input-label">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+          </svg>
+          Time Period (years)
+        </label>
+        <p class="input-helper">Enter the investment duration in years (e.g., 5)</p>
+        <input type="number" id="time" step="1" min="0" required 
+          placeholder="Enter duration in years" 
+          class="input-field" 
+          title="How many years you plan to keep your investment" />
+        <div class="input-icon">yrs</div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-container">
+          <label for="startDate" class="input-label">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+            </svg>
+            Start Date
+          </label>
+          <p class="input-helper">Select when you want to start your investment</p>
+          <input type="date" id="startDate" 
+            class="input-field" 
+            title="The date you want to start your investment" />
+        </div>
+        <div class="input-container">
+          <label for="endDate" class="input-label">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+            </svg>
+            End Date
+          </label>
+          <p class="input-helper">Select when you want to end your investment</p>
+          <input type="date" id="endDate" 
+            class="input-field" 
+            title="The date you want to end your investment" />
+        </div>
+      </div>
+
+      <div class="section-title">🏦 Bank/Fund Comparison</div>
+      
+      <div class="input-container">
+        <label for="bankComparison" class="input-label">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+          </svg>
+          Compare Bank/Fund Rates
+        </label>
+        <p class="input-helper">Select a bank or fund to compare their current interest rates</p>
+        <select id="bankComparison" class="input-field"
+          title="Compare interest rates across different banks and funds">
+          <option value="">Select a bank/fund to compare</option>
+          <option value="sbi">State Bank of India (SBI) - 6.50%</option>
+          <option value="hdfc">HDFC Bank - 6.75%</option>
+          <option value="icici">ICICI Bank - 6.80%</option>
+          <option value="axis">Axis Bank - 6.85%</option>
+          <option value="pnb">Punjab National Bank (PNB) - 6.40%</option>
+          <option value="kotak">Kotak Mahindra Bank - 6.70%</option>
+          <option value="yes">Yes Bank - 6.90%</option>
+          <option value="idfc">IDFC First Bank - 7.00%</option>
+          <option value="post">India Post Office - 6.60%</option>
+          <option value="nsc">National Savings Certificate (NSC) - 6.80%</option>
+          <option value="kvp">Kisan Vikas Patra (KVP) - 7.00%</option>
+          <option value="sukanya">Sukanya Samriddhi Yojana - 7.60%</option>
+          <option value="ppf">Public Provident Fund (PPF) - 7.10%</option>
+        </select>
+      </div>
+
+      <div id="comparisonResults" class="hidden mt-4 bg-indigo-50/50 p-4 rounded-lg">
+        <h3 class="analysis-subtitle">Comparison Results</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white p-3 rounded-lg shadow-sm">
+            <h4 class="font-medium text-indigo-600 mb-2">Selected Bank/Fund</h4>
+            <p class="text-gray-600 text-sm mb-2">Interest Rate: <span id="selectedRate" class="font-medium"></span></p>
+            <p class="text-gray-600 text-sm mb-2">Total Interest: <span id="selectedInterest" class="font-medium text-green-600"></span></p>
+            <p class="text-gray-600 text-sm">Total Amount: <span id="selectedAmount" class="font-medium text-indigo-600"></span></p>
+          </div>
+          <div class="bg-white p-3 rounded-lg shadow-sm">
+            <h4 class="font-medium text-indigo-600 mb-2">Your Current Rate</h4>
+            <p class="text-gray-600 text-sm mb-2">Interest Rate: <span id="currentRate" class="font-medium"></span></p>
+            <p class="text-gray-600 text-sm mb-2">Total Interest: <span id="currentInterest" class="font-medium text-green-600"></span></p>
+            <p class="text-gray-600 text-sm">Total Amount: <span id="currentAmount" class="font-medium text-indigo-600"></span></p>
+          </div>
+        </div>
+        <div class="mt-3 text-center">
+          <p class="text-sm text-gray-600">Difference in Returns: <span id="differenceAmount" class="font-medium"></span></p>
+        </div>
+      </div>
+
+      <div class="section-title">📊 Interest Options</div>
+      
+      <div class="input-container">
+        <label for="interestType" class="input-label">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" />
+          </svg>
+          Interest Type
+        </label>
+        <p class="input-helper">Choose between simple or compound interest calculation</p>
+        <select id="interestType" class="input-field"
+          title="Simple interest: Calculated only on principal. Compound interest: Calculated on principal plus accumulated interest">
+          <option value="simple">Simple Interest</option>
+          <option value="compound">Compound Interest</option>
+        </select>
+      </div>
+
+      <div id="compoundingDiv" class="input-container hidden">
+        <label for="compounding" class="input-label">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+          Compounding Frequency
+        </label>
+        <p class="input-helper">Select how often interest is calculated and added to principal</p>
+        <select id="compounding" class="input-field"
+          title="How often the interest is calculated and added to the principal">
+          <option value="1">Yearly</option>
+          <option value="2">Half-Yearly</option>
+          <option value="4">Quarterly</option>
+          <option value="12">Monthly</option>
+        </select>
+      </div>
+
+      <div class="flex space-x-4 mt-6">
+        <button type="button" id="resetBtn" class="reset-btn flex-1 px-4 py-3 rounded-xl flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+          </svg>
+          Reset Calculator
+        </button>
+      </div>
+    </form>
+
+    <div id="results" class="hidden mt-6 rounded-xl p-6 result-card">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="analysis-title">Results</h2>
+        <button id="downloadBtn" class="download-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+          Download PDF
+        </button>
+      </div>
+      <p class="result-text mb-2">Total Interest: <span id="totalInterest" class="result-value text-green-600"></span></p>
+      <p class="result-text">Total Amount: <span id="totalAmount" class="result-value text-indigo-600"></span></p>
+    </div>
+
+    <div id="analysis" class="hidden mt-6 rounded-xl p-6 analysis-card">
+      <h2 class="analysis-title">📊 Calculation Analysis</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-indigo-50/50 p-4 rounded-lg">
+          <h3 class="analysis-subtitle">📝 Input Values</h3>
+          <p class="analysis-text mb-2">💰 Principal: <span id="analysisPrincipal" class="font-medium"></span></p>
+          <p class="analysis-text mb-2">📈 Interest Rate: <span id="analysisRate" class="font-medium"></span></p>
+          <p class="analysis-text mb-2">⏱️ Time Period: <span id="analysisTime" class="font-medium"></span></p>
+          <p class="analysis-text mb-2">📋 Interest Type: <span id="analysisType" class="font-medium"></span></p>
+          <p id="analysisCompounding" class="analysis-text mb-2 hidden">🔄 Compounding Frequency: <span class="font-medium"></span></p>
+          <div id="dateInfo" class="hidden"></div>
+        </div>
+        <div class="bg-green-50/50 p-4 rounded-lg">
+          <h3 class="analysis-subtitle">Calculation Details</h3>
+          <p class="analysis-text mb-2">Interest Earned: <span id="analysisInterest" class="font-medium text-green-600"></span></p>
+          <p class="analysis-text mb-2">Interest Rate per Period: <span id="analysisPeriodRate" class="font-medium"></span></p>
+          <p class="analysis-text mb-2">Total Periods: <span id="analysisPeriods" class="font-medium"></span></p>
+          <p class="analysis-text mb-2">Growth Rate: <span id="analysisGrowth" class="font-medium"></span></p>
+        </div>
+      </div>
+
+      <!-- Add AI Suggestions Section -->
+      <div class="mt-4 bg-indigo-50/50 p-4 rounded-lg">
+        <h3 class="analysis-subtitle">💡 Smart Suggestions</h3>
+        <div id="aiSuggestions" class="space-y-2">
+          <!-- Suggestions will be dynamically inserted here -->
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <div class="flex justify-between items-center mb-4">
+        <div class="chart-tabs">
+          <div class="chart-tab active" data-chart="line">Growth Over Time</div>
+          <div class="chart-tab" data-chart="bar">Yearly Comparison</div>
+          <div class="chart-tab" data-chart="monthly">Monthly Breakdown</div>
+          <div class="chart-tab" data-chart="date">Date-wise Growth</div>
+        </div>
+        <button id="toggleRotation" class="hidden flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+          </svg>
+          <span>Auto-Rotate</span>
+        </button>
+      </div>
+
+      <div class="chart-wrapper active" id="lineChart">
+        <canvas id="growthChart" height="200"></canvas>
+      </div>
+      <div class="chart-wrapper" id="barChart">
+        <canvas id="yearlyChart" height="200"></canvas>
+      </div>
+      <div class="chart-wrapper" id="monthlyChart">
+        <canvas id="monthlyBreakdownChart" height="200"></canvas>
+      </div>
+      <div class="chart-wrapper" id="dateChart">
+        <canvas id="dateWiseChart" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📌 Footer -->
+  <footer class="mt-10 text-center text-sm text-gray-600">
+    © <span id="year"></span> Raghavendra Kumar Padharla. All rights reserved.
+  </footer>
+
+  <!-- Chat/FAQ Assistant -->
+  <div id="chatButton" class="fixed bottom-4 right-4 z-50">
+      <button class="bg-indigo-600 text-white rounded-full p-4 shadow-lg hover:bg-indigo-700 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+      </button>
+  </div>
+
+  <div id="chatPopup" class="fixed bottom-20 right-4 w-80 bg-white rounded-lg shadow-xl hidden z-50">
+      <div class="p-4 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+              <h3 class="text-lg font-semibold text-gray-800">Quick Help</h3>
+              <button id="closeChat" class="text-gray-500 hover:text-gray-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+              </button>
+          </div>
+      </div>
+      <div class="p-4 max-h-96 overflow-y-auto">
+          <div class="space-y-4">
+              <div class="bg-gray-50 p-3 rounded-lg">
+                  <h4 class="font-medium text-indigo-600 mb-2">What is compound interest?</h4>
+                  <p class="text-gray-600 text-sm">Compound interest is when you earn interest on both your initial investment and the accumulated interest from previous periods. It's like interest earning interest, which helps your money grow faster over time.</p>
+              </div>
+              <div class="bg-gray-50 p-3 rounded-lg">
+                  <h4 class="font-medium text-indigo-600 mb-2">What does quarterly mean?</h4>
+                  <p class="text-gray-600 text-sm">Quarterly means four times a year (every 3 months). When interest compounds quarterly, your interest is calculated and added to your principal every three months, allowing for more frequent growth of your investment.</p>
+              </div>
+              <div class="bg-gray-50 p-3 rounded-lg">
+                  <h4 class="font-medium text-indigo-600 mb-2">What's the benefit of long-term investing?</h4>
+                  <p class="text-gray-600 text-sm">Long-term investing takes advantage of compound interest over many years. The longer your money is invested, the more time it has to grow exponentially. This can lead to significantly larger returns compared to short-term investing.</p>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const calculatorForm = document.getElementById('calculatorForm');
+      const resetBtn = document.getElementById('resetBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const interestType = document.getElementById('interestType');
+      const compoundingDiv = document.getElementById('compoundingDiv');
+      const resultsDiv = document.getElementById('results');
+      let lineChart = null;
+      let barChart = null;
+      let monthlyChart = null;
+      let dateChart = null;
+
+      // Add theme toggle functionality
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      
+      // Check for saved theme preference
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        themeToggle.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        `;
+      }
+
+      // Theme toggle click handler
+      themeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        const isDarkMode = body.classList.contains('dark-mode');
+        
+        // Save theme preference
+        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        
+        // Update toggle button icon
+        themeToggle.innerHTML = isDarkMode ? `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        ` : `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        `;
+
+        // Update chart colors for dark mode
+        if (lineChart) lineChart.update();
+        if (barChart) barChart.update();
+        if (monthlyChart) monthlyChart.update();
+        if (dateChart) dateChart.update();
+      });
+
+      // Function to perform calculation
+      function calculate() {
+        const principal = parseFloat(document.getElementById('principal').value) || 0;
+        const rate = parseFloat(document.getElementById('rate').value) || 0;
+        const timeInput = parseFloat(document.getElementById('time').value) || 0;
+        const type = interestType.value;
+        const compounding = type === 'compound' ? parseInt(document.getElementById('compounding').value) : 1;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+        // Calculate time from dates if both dates are provided
+        let time = timeInput;
+        let exactDays = 0;
+        if (startDate && endDate) {
+          const startDateObj = new Date(startDate);
+          const endDateObj = new Date(endDate);
+          
+          // Check if end date is after start date
+          if (endDateObj <= startDateObj) {
+            alert("End date must be after start date");
+            document.getElementById('endDate').value = startDate;
+            return;
+          }
+          
+          // Calculate exact days between dates using UTC to avoid timezone issues
+          const startUTC = Date.UTC(startDateObj.getFullYear(), startDateObj.getMonth(), startDateObj.getDate());
+          const endUTC = Date.UTC(endDateObj.getFullYear(), endDateObj.getMonth(), endDateObj.getDate());
+          const diffTime = endUTC - startUTC;
+          exactDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // Add 1 to include both start and end dates
+          time = exactDays / 365; // Convert to years for calculation
+          
+          // Update the time input field to match the calculated time
+          document.getElementById('time').value = time.toFixed(4);
+        }
+
+        if (principal <= 0 || rate <= 0 || time <= 0) {
+          resultsDiv.classList.add('hidden');
+          document.getElementById('analysis').classList.add('hidden');
+          return;
+        }
+
+        let totalInterest, totalAmount;
+
+        if (type === 'simple') {
+          // Simple interest calculation using exact days
+          if (startDate && endDate) {
+            totalInterest = (principal * rate * exactDays) / (365 * 100);
+          } else {
+            totalInterest = (principal * rate * time) / 100;
+          }
+          totalAmount = principal + totalInterest;
+        } else {
+          // Compound interest calculation using exact days
+          if (startDate && endDate) {
+            const r = rate / 100;
+            const n = compounding;
+            const t = exactDays / 365;
+            totalAmount = principal * Math.pow(1 + (r / n), n * t);
+          } else {
+            const r = rate / 100;
+            totalAmount = principal * Math.pow(1 + (r / compounding), compounding * time);
+          }
+          totalInterest = totalAmount - principal;
+        }
+
+        // Round to 2 decimal places for display
+        totalInterest = Math.round(totalInterest * 100) / 100;
+        totalAmount = Math.round(totalAmount * 100) / 100;
+
+        // Update results display
+        document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+        document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+        resultsDiv.classList.remove('hidden');
+
+        // Update analysis display
+        document.getElementById('analysisPrincipal').textContent = formatCurrency(principal);
+        document.getElementById('analysisRate').textContent = `${rate}%`;
+        
+        // Update time period display based on whether dates are used
+        if (startDate && endDate) {
+          const startDateObj = new Date(startDate);
+          const endDateObj = new Date(endDate);
+          const startUTC = Date.UTC(startDateObj.getFullYear(), startDateObj.getMonth(), startDateObj.getDate());
+          const endUTC = Date.UTC(endDateObj.getFullYear(), endDateObj.getMonth(), endDateObj.getDate());
+          const diffTime = endUTC - startUTC;
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // Add 1 to include both start and end dates
+          
+          // Show years if 365 days or more, otherwise show days
+          if (diffDays >= 365) {
+            const years = Math.floor(diffDays / 365);
+            const remainingDays = diffDays % 365;
+            document.getElementById('analysisTime').textContent = `${years} year${years > 1 ? 's' : ''} ${remainingDays > 0 ? `(${remainingDays} days)` : ''}`;
+          } else {
+            document.getElementById('analysisTime').textContent = `${diffDays} days`;
+          }
+        } else {
+          document.getElementById('analysisTime').textContent = `${Math.floor(time)} years`;
+        }
+        
+        document.getElementById('analysisType').textContent = type === 'simple' ? 'Simple Interest' : 'Compound Interest';
+        
+        // Add date information to analysis if available
+        const dateInfoElement = document.getElementById('dateInfo');
+        if (startDate && endDate) {
+          const startDateObj = new Date(startDate);
+          const endDateObj = new Date(endDate);
+          const formattedStartDate = startDateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+          const formattedEndDate = endDateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+          const startUTC = Date.UTC(startDateObj.getFullYear(), startDateObj.getMonth(), startDateObj.getDate());
+          const endUTC = Date.UTC(endDateObj.getFullYear(), endDateObj.getMonth(), endDateObj.getDate());
+          const diffTime = endUTC - startUTC;
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // Add 1 to include both start and end dates
+          
+          // Show years if 365 days or more, otherwise show days
+          let durationText;
+          if (diffDays >= 365) {
+            const years = Math.floor(diffDays / 365);
+            const remainingDays = diffDays % 365;
+            durationText = `${years} year${years > 1 ? 's' : ''} ${remainingDays > 0 ? `(${remainingDays} days)` : ''}`;
+          } else {
+            durationText = `${diffDays} days`;
+          }
+          
+          dateInfoElement.innerHTML = `
+            <p class="analysis-text mb-2">📅 Start Date: <span class="font-medium">${formattedStartDate}</span></p>
+            <p class="analysis-text mb-2">📅 End Date: <span class="font-medium">${formattedEndDate}</span></p>
+            <p class="analysis-text mb-2">⏱️ Duration: <span class="font-medium">${durationText}</span></p>
+          `;
+          dateInfoElement.classList.remove('hidden');
+        } else {
+          dateInfoElement.classList.add('hidden');
+        }
+        
+        const compoundingElement = document.getElementById('analysisCompounding');
+        if (type === 'compound') {
+          const frequencyText = {
+            1: 'Yearly',
+            2: 'Half-Yearly',
+            4: 'Quarterly',
+            12: 'Monthly'
+          }[compounding];
+          compoundingElement.classList.remove('hidden');
+          compoundingElement.querySelector('span').textContent = frequencyText;
+        } else {
+          compoundingElement.classList.add('hidden');
+        }
+
+        document.getElementById('analysisInterest').textContent = formatCurrency(totalInterest);
+        document.getElementById('analysisPeriodRate').textContent = type === 'simple' 
+          ? `${rate}%` 
+          : `${(rate/compounding).toFixed(2)}% per period`;
+        
+        // Update total periods display with the same year/day logic
+        if (startDate && endDate) {
+          const startDateObj = new Date(startDate);
+          const endDateObj = new Date(endDate);
+          const diffTime = endDateObj - startDateObj;
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+          
+          let periodsText;
+          if (diffDays >= 365) {
+            const years = Math.floor(diffDays / 365);
+            const remainingDays = diffDays % 365;
+            periodsText = `${years} year${years > 1 ? 's' : ''} ${remainingDays > 0 ? `(${remainingDays} days)` : ''}`;
+          } else {
+            periodsText = `${diffDays} days`;
+          }
+          
+          document.getElementById('analysisPeriods').textContent = periodsText;
+        } else {
+          document.getElementById('analysisPeriods').textContent = `${Math.floor(time)} years`;
+        }
+        
+        document.getElementById('analysisGrowth').textContent = type === 'simple'
+          ? `${rate}% per year`
+          : `${((totalAmount/principal - 1) * 100).toFixed(2)}% total growth`;
+
+        document.getElementById('analysis').classList.remove('hidden');
+
+        updateCharts(principal, rate, time, type, compounding);
+
+        // Generate and display AI suggestions
+        generateSuggestions(principal, rate, time, type, compounding);
+      }
+
+      // Add new function for generating AI suggestions
+      function generateSuggestions(principal, rate, time, type, compounding) {
+        const suggestions = [];
+        
+        // Suggestion 1: Extended investment period
+        const extendedTime = time + 2;
+        let extendedInterest;
+        if (type === 'simple') {
+          extendedInterest = (principal * rate * extendedTime) / 100;
+        } else {
+          const extendedAmount = principal * Math.pow(1 + (rate / 100 / compounding), compounding * extendedTime);
+          extendedInterest = extendedAmount - principal;
+        }
+        const currentInterest = type === 'simple' 
+          ? (principal * rate * time) / 100
+          : (principal * Math.pow(1 + (rate / 100 / compounding), compounding * time) - principal);
+        const additionalInterest = extendedInterest - currentInterest;
+        
+        if (additionalInterest > 0) {
+          suggestions.push({
+            icon: '⏳',
+            text: `If you invest for 2 more years at this rate, your additional interest would be ${formatCurrency(additionalInterest)}.`
+          });
+        }
+
+        // Suggestion 2: Compounding frequency optimization
+        if (type === 'compound' && compounding < 12) {
+          const monthlyAmount = principal * Math.pow(1 + (rate / 100 / 12), 12 * time);
+          const currentAmount = principal * Math.pow(1 + (rate / 100 / compounding), compounding * time);
+          const difference = monthlyAmount - currentAmount;
+          
+          if (difference > 0) {
+            suggestions.push({
+              icon: '📈',
+              text: `Switch to monthly compounding to earn an additional ${formatCurrency(difference)} over the same period.`
+            });
+          }
+        }
+
+        // Suggestion 3: Rate comparison
+        const marketRate = 8.5; // Example market rate
+        if (rate < marketRate) {
+          suggestions.push({
+            icon: '💡',
+            text: `Current market rates are around ${marketRate}%. Consider exploring investment options with higher returns.`
+          });
+        }
+
+        // Display suggestions
+        const suggestionsContainer = document.getElementById('aiSuggestions');
+        suggestionsContainer.innerHTML = suggestions.map(suggestion => `
+          <div class="analysis-text flex items-start gap-2">
+            <span class="text-xl">${suggestion.icon}</span>
+            <span>${suggestion.text}</span>
+          </div>
+        `).join('') || `
+          <div class="analysis-text text-gray-500 italic">
+            No suggestions available for the current investment parameters.
+          </div>
+        `;
+      }
+
+      // Add event listeners for automatic calculation
+      document.getElementById('principal').addEventListener('input', calculate);
+      document.getElementById('rate').addEventListener('input', calculate);
+      document.getElementById('time').addEventListener('input', function() {
+        // When time is manually entered, clear the dates
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        calculate();
+      });
+      document.getElementById('startDate').addEventListener('change', calculate);
+      document.getElementById('endDate').addEventListener('change', calculate);
+      interestType.addEventListener('change', () => {
+        compoundingDiv.classList.toggle('hidden', interestType.value === 'simple');
+        calculate();
+      });
+      document.getElementById('compounding').addEventListener('change', calculate);
+      document.getElementById('bankComparison').addEventListener('change', calculate);
+
+      // Add debounce function to prevent excessive calculations during rapid typing
+      function debounce(func, wait) {
+        let timeout;
+        return function() {
+          const context = this;
+          const args = arguments;
+          clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            func.apply(context, args);
+          }, wait);
+        };
+      }
+
+      // Create debounced version of calculate function for smoother performance
+      const debouncedCalculate = debounce(calculate, 100);
+
+      // Update event listeners to use debounced calculation for text inputs
+      document.getElementById('principal').addEventListener('input', debouncedCalculate);
+      document.getElementById('rate').addEventListener('input', debouncedCalculate);
+      document.getElementById('time').addEventListener('input', function() {
+        // When time is manually entered, clear the dates
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        debouncedCalculate();
+      });
+
+      resetBtn.addEventListener('click', () => {
+        calculatorForm.reset();
+        resultsDiv.classList.add('hidden');
+        document.getElementById('analysis').classList.add('hidden');
+        compoundingDiv.classList.add('hidden');
+        if (lineChart) {
+          lineChart.destroy();
+          lineChart = null;
+        }
+        if (barChart) {
+          barChart.destroy();
+          barChart = null;
+        }
+        if (monthlyChart) {
+          monthlyChart.destroy();
+          monthlyChart = null;
+        }
+        if (dateChart) {
+          dateChart.destroy();
+          dateChart = null;
+        }
+      });
+
+      // Remove the form submit event listener since we're calculating automatically
+      calculatorForm.removeEventListener('submit', (e) => e.preventDefault());
+
+      function formatCurrency(amount) {
+        return new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(amount);
+      }
+
+      function updateCharts(principal, rate, time, type, compounding) {
+        const labels = [];
+        const data = [];
+        const yearlyData = [];
+        const yearlyLabels = [];
+        const monthlyData = [];
+        const monthlyLabels = [];
+        const dateData = [];
+        const dateLabels = [];
+
+        // Ensure time is a whole number for chart generation
+        const roundedTime = Math.ceil(time);
+        
+        // Generate yearly data
+        for (let year = 0; year <= roundedTime; year++) {
+          labels.push(`Year ${year}`);
+          yearlyLabels.push(year.toString());
+          
+          if (type === 'simple') {
+            const amount = principal + (principal * rate * year) / 100;
+            data.push(amount);
+            yearlyData.push(amount - principal);
+          } else {
+            const amount = principal * Math.pow(1 + (rate / 100 / compounding), compounding * year);
+            data.push(amount);
+            yearlyData.push(amount - principal);
+          }
+        }
+
+        // Generate monthly data
+        const totalMonths = roundedTime * 12;
+        for (let month = 0; month <= totalMonths; month++) {
+          const monthYear = month / 12;
+          monthlyLabels.push(`Month ${month}`);
+          
+          if (type === 'simple') {
+            const amount = principal + (principal * rate * monthYear) / 100;
+            monthlyData.push(amount);
+          } else {
+            const amount = principal * Math.pow(1 + (rate / 100 / compounding), compounding * monthYear);
+            monthlyData.push(amount);
+          }
+        }
+
+        // Generate date-wise data
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+        if (startDate && endDate) {
+          const start = new Date(startDate);
+          const end = new Date(endDate);
+          const diffTime = end - start;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          // Generate data points for every single day
+          for (let i = 0; i <= diffDays; i++) {
+            const currentDate = new Date(start);
+            currentDate.setDate(start.getDate() + i);
+            dateLabels.push(currentDate.toLocaleDateString('en-IN', { 
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric'
+            }));
+            
+            const yearFraction = i / 365;
+            if (type === 'simple') {
+              const amount = principal + (principal * rate * yearFraction) / 100;
+              dateData.push(amount);
+            } else {
+              const amount = principal * Math.pow(1 + (rate / 100 / compounding), compounding * yearFraction);
+              dateData.push(amount);
+            }
+          }
+        }
+
+        // Update all charts
+        updateLineChart(labels, data);
+        updateBarChart(yearlyLabels, yearlyData);
+        updateMonthlyChart(monthlyLabels, monthlyData);
+        if (dateLabels.length > 0) {
+          updateDateChart(dateLabels, dateData);
+        }
+      }
+
+      function updateLineChart(labels, data) {
+        if (lineChart) lineChart.destroy();
+
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        lineChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: '📈 Total Amount',
+              data: data,
+              borderColor: 'rgb(99, 102, 241)',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              borderWidth: 3,
+              tension: 0.4,
+              fill: true,
+              pointBackgroundColor: 'rgb(99, 102, 241)',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 2000,
+              easing: 'easeInOutQuart'
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  font: {
+                    family: 'Inter',
+                    size: 16,
+                    weight: '600'
+                  },
+                  padding: 20
+                }
+              },
+              title: {
+                display: true,
+                text: 'Total Amount Growth Over Time',
+                font: {
+                  family: 'Inter',
+                  size: 18,
+                  weight: '600'
+                },
+                padding: {
+                  top: 10,
+                  bottom: 20
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: '#1f2937',
+                bodyColor: '#4f46e5',
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                padding: 12,
+                bodyFont: {
+                  family: 'Inter',
+                  size: 14
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  font: {
+                    size: 14
+                  }
+                }
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)'
+                },
+                ticks: {
+                  font: {
+                    size: 14
+                  },
+                  callback: function(value) {
+                    return new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    }).format(value);
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      function updateBarChart(labels, data) {
+        if (barChart) barChart.destroy();
+
+        const ctx = document.getElementById('yearlyChart').getContext('2d');
+        
+        // Calculate yearly breakdowns
+        const principal = parseFloat(document.getElementById('principal').value) || 0;
+        const rate = parseFloat(document.getElementById('rate').value) || 0;
+        const type = document.getElementById('interestType').value;
+        const compounding = type === 'compound' ? parseInt(document.getElementById('compounding').value) : 1;
+        
+        const yearlyData = [];
+        const principalData = [];
+        const interestData = [];
+        
+        for (let year = 0; year < labels.length; year++) {
+          let yearAmount, yearInterest;
+          
+          if (type === 'simple') {
+            yearAmount = principal + (principal * rate * year) / 100;
+            yearInterest = (principal * rate * year) / 100;
+          } else {
+            yearAmount = principal * Math.pow(1 + (rate / 100 / compounding), compounding * year);
+            yearInterest = yearAmount - principal;
+          }
+          
+          principalData.push(principal);
+          interestData.push(yearInterest);
+          yearlyData.push(yearAmount);
+        }
+
+        barChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Principal Amount',
+                data: principalData,
+                backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                borderColor: 'rgb(99, 102, 241)',
+                borderWidth: 1,
+                borderRadius: 5,
+                stack: 'stack'
+              },
+              {
+                label: 'Interest Earned',
+                data: interestData,
+                backgroundColor: 'rgba(34, 197, 94, 0.6)',
+                borderColor: 'rgb(34, 197, 94)',
+                borderWidth: 1,
+                borderRadius: 5,
+                stack: 'stack'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 2000,
+              easing: 'easeInOutQuart'
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  font: {
+                    family: 'Inter',
+                    size: 16,
+                    weight: '600'
+                  },
+                  padding: 20
+                }
+              },
+              title: {
+                display: true,
+                text: 'Yearly Investment Breakdown',
+                font: {
+                  family: 'Inter',
+                  size: 18,
+                  weight: '600'
+                },
+                padding: {
+                  top: 10,
+                  bottom: 20
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: '#1f2937',
+                bodyColor: '#4f46e5',
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                padding: 12,
+                bodyFont: {
+                  family: 'Inter',
+                  size: 14
+                },
+                callbacks: {
+                  label: function(context) {
+                    const label = context.dataset.label || '';
+                    const value = context.raw || 0;
+                    const formattedValue = new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    }).format(value);
+                    return `${label}: ${formattedValue}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false
+                },
+                title: {
+                  display: true,
+                  text: 'Year',
+                  font: {
+                    family: 'Inter',
+                    size: 16,
+                    weight: '600'
+                  }
+                },
+                ticks: {
+                  font: {
+                    size: 14
+                  }
+                }
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)'
+                },
+                title: {
+                  display: true,
+                  text: 'Amount (₹)',
+                  font: {
+                    family: 'Inter',
+                    size: 16,
+                    weight: '600'
+                  }
+                },
+                ticks: {
+                  font: {
+                    size: 14
+                  },
+                  callback: function(value) {
+                    return new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    }).format(value);
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      function updateMonthlyChart(labels, data) {
+        if (monthlyChart) monthlyChart.destroy();
+
+        const ctx = document.getElementById('monthlyBreakdownChart').getContext('2d');
+        
+        // Calculate monthly breakdowns
+        const principal = parseFloat(document.getElementById('principal').value) || 0;
+        const rate = parseFloat(document.getElementById('rate').value) || 0;
+        const type = document.getElementById('interestType').value;
+        const compounding = type === 'compound' ? parseInt(document.getElementById('compounding').value) : 1;
+        
+        const monthlyPrincipalData = [];
+        const monthlyInterestData = [];
+        
+        for (let month = 0; month < labels.length; month++) {
+          const monthYear = month / 12;
+          let monthAmount, monthInterest;
+          
+          if (type === 'simple') {
+            monthAmount = principal + (principal * rate * monthYear) / 100;
+            monthInterest = (principal * rate * monthYear) / 100;
+          } else {
+            monthAmount = principal * Math.pow(1 + (rate / 100 / compounding), compounding * monthYear);
+            monthInterest = monthAmount - principal;
+          }
+          
+          monthlyPrincipalData.push(principal);
+          monthlyInterestData.push(monthInterest);
+        }
+
+        monthlyChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Principal Amount',
+                data: monthlyPrincipalData,
+                backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                borderColor: 'rgb(99, 102, 241)',
+                borderWidth: 1,
+                borderRadius: 5,
+                stack: 'stack'
+              },
+              {
+                label: 'Interest Earned',
+                data: monthlyInterestData,
+                backgroundColor: 'rgba(34, 197, 94, 0.6)',
+                borderColor: 'rgb(34, 197, 94)',
+                borderWidth: 1,
+                borderRadius: 5,
+                stack: 'stack'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 2000,
+              easing: 'easeInOutQuart'
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  font: {
+                    family: 'Inter',
+                    size: 16,
+                    weight: '600'
+                  },
+                  padding: 20
+                }
+              },
+              title: {
+                display: true,
+                text: 'Monthly Investment Breakdown',
+                font: {
+                  family: 'Inter',
+                  size: 18,
+                  weight: '600'
+                },
+                padding: {
+                  top: 10,
+                  bottom: 20
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: '#1f2937',
+                bodyColor: '#4f46e5',
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                padding: 12,
+                bodyFont: {
+                  family: 'Inter',
+                  size: 14
+                },
+                callbacks: {
+                  label: function(context) {
+                    const label = context.dataset.label || '';
+                    const value = context.raw || 0;
+                    const formattedValue = new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    }).format(value);
+                    return `${label}: ${formattedValue}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false
+                },
+                title: {
+                  display: true,
+                  text: 'Month',
+                  font: {
+                    family: 'Inter',
+                    size: 16,
+                    weight: '600'
+                  }
+                },
+                ticks: {
+                  font: {
+                    size: 14
+                  },
+                  maxRotation: 45,
+                  minRotation: 45
+                }
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)'
+                },
+                title: {
+                  display: true,
+                  text: 'Amount (₹)',
+                  font: {
+                    family: 'Inter',
+                    size: 16,
+                    weight: '600'
+                  }
+                },
+                ticks: {
+                  font: {
+                    size: 14
+                  },
+                  callback: function(value) {
+                    return new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    }).format(value);
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      function updateDateChart(labels, data) {
+        if (dateChart) {
+          dateChart.destroy();
+        }
+
+        const ctx = document.getElementById('dateWiseChart').getContext('2d');
+        const principal = parseFloat(document.getElementById('principal').value) || 0;
+        
+        dateChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Principal Amount',
+                data: Array(labels.length).fill(principal),
+                backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                borderColor: 'rgb(99, 102, 241)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: 'rgb(99, 102, 241)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+              },
+              {
+                label: 'Interest Earned',
+                data: data.map(amount => amount - principal),
+                backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                borderColor: 'rgb(34, 197, 94)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: 'rgb(34, 197, 94)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 2000,
+              easing: 'easeInOutQuart'
+            },
+            interaction: {
+              intersect: false,
+              mode: 'index'
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  font: {
+                    family: 'Inter',
+                    size: 16,
+                    weight: '600'
+                  },
+                  padding: 20,
+                  usePointStyle: true,
+                  pointStyle: 'circle'
+                }
+              },
+              title: {
+                display: true,
+                text: 'Daily Investment Growth',
+                font: {
+                  family: 'Inter',
+                  size: 18,
+                  weight: '600'
+                },
+                padding: {
+                  top: 10,
+                  bottom: 20
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#1f2937',
+                bodyColor: '#4f46e5',
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                padding: 12,
+                bodyFont: {
+                  family: 'Inter',
+                  size: 14
+                },
+                callbacks: {
+                  label: function(context) {
+                    const label = context.dataset.label || '';
+                    const value = context.raw || 0;
+                    const formattedValue = new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    }).format(value);
+                    return `${label}: ${formattedValue}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false
+                },
+                title: {
+                  display: true,
+                  text: 'Date',
+                  font: {
+                    family: 'Inter',
+                    size: 16,
+                    weight: '600'
+                  },
+                  padding: {
+                    top: 10
+                  }
+                },
+                ticks: {
+                  font: {
+                    size: 12,
+                    family: 'Inter'
+                  },
+                  maxRotation: 45,
+                  minRotation: 45,
+                  autoSkip: true,
+                  maxTicksLimit: 20,
+                  padding: 10,
+                  callback: function(value, index) {
+                    // Show dates in a more readable format
+                    const date = labels[index];
+                    return date;
+                  }
+                }
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)',
+                  drawBorder: false
+                },
+                title: {
+                  display: true,
+                  text: 'Amount (₹)',
+                  font: {
+                    family: 'Inter',
+                    size: 16,
+                    weight: '600'
+                  },
+                  padding: {
+                    top: 10
+                  }
+                },
+                ticks: {
+                  font: {
+                    size: 14,
+                    family: 'Inter'
+                  },
+                  padding: 10,
+                  callback: function(value) {
+                    return new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    }).format(value);
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Add chart tab switching functionality
+      let autoRotateInterval;
+      const ROTATION_INTERVAL = 3000; // 3 seconds per chart
+
+      function startChartRotation() {
+        // Clear any existing interval
+        if (autoRotateInterval) {
+          clearInterval(autoRotateInterval);
+        }
+
+        // Get all tabs and wrappers
+        const tabs = document.querySelectorAll('.chart-tab');
+        const wrappers = document.querySelectorAll('.chart-wrapper');
+        let currentIndex = 0;
+
+        // Function to switch to next chart
+        function switchToNextChart() {
+          // Remove active class from all tabs and wrappers
+          tabs.forEach(t => t.classList.remove('active'));
+          wrappers.forEach(w => w.classList.remove('active'));
+          
+          // Add active class to current tab and wrapper
+          tabs[currentIndex].classList.add('active');
+          wrappers[currentIndex].classList.add('active');
+          
+          // Move to next chart
+          currentIndex = (currentIndex + 1) % tabs.length;
+        }
+
+        // Start the rotation
+        autoRotateInterval = setInterval(switchToNextChart, ROTATION_INTERVAL);
+      }
+
+      function stopChartRotation() {
+        if (autoRotateInterval) {
+          clearInterval(autoRotateInterval);
+          autoRotateInterval = null;
+        }
+      }
+
+      // Add click handlers for manual chart selection
+      document.querySelectorAll('.chart-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Stop rotation when manually selecting a chart
+          stopChartRotation();
+
+          // Remove active class from all tabs and wrappers
+          document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.chart-wrapper').forEach(w => w.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding wrapper
+          tab.classList.add('active');
+          document.getElementById(`${tab.dataset.chart}Chart`).classList.add('active');
+          
+          // Recalculate and update charts when switching tabs
+          calculate();
+        });
+      });
+
+      // Start rotation when page loads
+      startChartRotation();
+
+      // Add hover pause functionality
+      const chartContainer = document.querySelector('.chart-container');
+      chartContainer.addEventListener('mouseenter', stopChartRotation);
+      chartContainer.addEventListener('mouseleave', startChartRotation);
+
+      // Modify the download button click handler
+      downloadBtn.addEventListener('click', async () => {
+        try {
+          // Stop the rotation before generating PDF
+          stopChartRotation();
+
+          // Show loading state
+          downloadBtn.disabled = true;
+          downloadBtn.innerHTML = `
+            <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Generating PDF...
+          `;
+
+          // Create a temporary container
+          const container = document.createElement('div');
+          container.style.position = 'fixed';
+          container.style.left = '-9999px';
+          container.style.top = '0';
+          container.style.width = '800px';
+          container.style.backgroundColor = 'white';
+          container.style.padding = '20px';
+          document.body.appendChild(container);
+
+          // Clone Results and Analysis sections
+          const resultsSection = document.getElementById('results').cloneNode(true);
+          const analysisSection = document.getElementById('analysis').cloneNode(true);
+
+          // Remove the download button from the clone
+          const downloadBtnClone = resultsSection.querySelector('#downloadBtn');
+          if (downloadBtnClone) {
+            downloadBtnClone.remove();
+          }
+
+          // Add sections to container
+          container.appendChild(resultsSection);
+          container.appendChild(analysisSection);
+
+          // Wait for content to be ready
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          // Initialize jsPDF
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+
+          // Capture the content
+          const contentCanvas = await html2canvas(container, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+          });
+
+          // Calculate dimensions to fit the page
+          const contentImgWidth = pageWidth - 20;
+          const contentImgHeight = (contentCanvas.height * contentImgWidth) / contentCanvas.width;
+
+          // Add the content image to PDF
+          const contentImgData = contentCanvas.toDataURL('image/jpeg', 1.0);
+          pdf.addImage(contentImgData, 'JPEG', 10, 10, contentImgWidth, contentImgHeight);
+
+          // Add page number
+          pdf.setFontSize(10);
+          pdf.text('Page 1', pageWidth - 20, pageHeight - 10);
+
+          // Get all charts
+          const chartTabs = document.querySelectorAll('.chart-tab');
+          const chartWrappers = document.querySelectorAll('.chart-wrapper');
+          let currentPage = 2;
+
+          // Process each chart
+          for (let i = 0; i < chartTabs.length; i++) {
+            // Switch to the current chart
+            chartTabs.forEach(t => t.classList.remove('active'));
+            chartWrappers.forEach(w => w.classList.remove('active'));
+            chartTabs[i].classList.add('active');
+            chartWrappers[i].classList.add('active');
+
+            // Wait for chart to render
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Add new page for chart
+            pdf.addPage();
+
+            // Get chart title and canvas
+            const chartTitle = chartTabs[i].textContent;
+            const chartCanvas = chartWrappers[i].querySelector('canvas');
+
+            // Add chart title
+            pdf.setFontSize(16);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(chartTitle, 10, 20);
+            pdf.setFont(undefined, 'normal');
+
+            // Capture the chart
+            const chartImgCanvas = await html2canvas(chartCanvas, {
+              scale: 2,
+              useCORS: true,
+              logging: false,
+              backgroundColor: '#ffffff'
+            });
+
+            // Calculate chart dimensions
+            const chartImgWidth = pageWidth - 20;
+            const chartImgHeight = (chartImgCanvas.height * chartImgWidth) / chartImgCanvas.width;
+
+            // Add chart to PDF
+            const chartImgData = chartImgCanvas.toDataURL('image/jpeg', 1.0);
+            pdf.addImage(chartImgData, 'JPEG', 10, 30, chartImgWidth, chartImgHeight);
+
+            // Add page number
+            pdf.setFontSize(10);
+            pdf.text(`Page ${currentPage}`, pageWidth - 20, pageHeight - 10);
+            currentPage++;
+          }
+
+          // Clean up
+          document.body.removeChild(container);
+
+          // Save the PDF
+          pdf.save('investment-analysis.pdf');
+
+          // Restart chart rotation
+          startChartRotation();
+
+          // Reset button state
+          downloadBtn.disabled = false;
+          downloadBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+            Download PDF
+          `;
+        } catch (error) {
+          console.error('Error generating PDF:', error);
+          
+          // Show more detailed error message
+          alert(`Error generating PDF: ${error.message}. Please try again.`);
+          
+          // Reset button state on error
+          downloadBtn.disabled = false;
+          downloadBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+            Download PDF
+          `;
+
+          // Restart chart rotation on error
+          startChartRotation();
+        }
+      });
+
+      // Set footer year dynamically
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Add input event listeners to prevent negative values and decimals
+      const numberInputs = document.querySelectorAll('input[type="number"]');
+      numberInputs.forEach(input => {
+        input.addEventListener('input', function() {
+          if (this.value < 0) {
+            this.value = 0;
+          }
+          // Remove decimals
+          if (this.id === 'time') {
+            this.value = Math.floor(this.value);
+          }
+        });
+
+        // Prevent typing negative sign and decimal point
+        input.addEventListener('keydown', function(e) {
+          if (e.key === '-' || e.keyCode === 189 || e.key === '.' || e.keyCode === 190) {
+            e.preventDefault();
+          }
+        });
+
+        // Prevent pasting negative values and decimals
+        input.addEventListener('paste', function(e) {
+          let pastedText = (e.clipboardData || window.clipboardData).getData('text');
+          if (parseFloat(pastedText) < 0 || pastedText.includes('.')) {
+            e.preventDefault();
+          }
+        });
+      });
+
+      // Set default dates
+      const today = new Date();
+      const fiveYearsLater = new Date();
+      fiveYearsLater.setFullYear(today.getFullYear() + 5);
+      
+      document.getElementById('startDate').value = today.toISOString().split('T')[0];
+      document.getElementById('endDate').value = fiveYearsLater.toISOString().split('T')[0];
+      
+      // Calculate initial values based on default dates
+      calculate();
+
+      // Add sidebar toggle functionality
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const sidebar = document.getElementById('sidebar');
+      
+      function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        // Update toggle button icon
+        sidebarToggle.innerHTML = sidebar.classList.contains('active') ? `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        ` : `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        `;
+      }
+
+      sidebarToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+      });
+
+      // Close sidebar when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target) && sidebar.classList.contains('active')) {
+          toggleSidebar();
+        }
+      });
+
+      // Prevent sidebar from closing when clicking inside it
+      sidebar.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      // Chat/FAQ Assistant functionality
+      const chatButton = document.getElementById('chatButton');
+      const chatPopup = document.getElementById('chatPopup');
+      const closeChat = document.getElementById('closeChat');
+
+      chatButton.addEventListener('click', () => {
+          chatPopup.classList.remove('hidden');
+          chatButton.classList.add('hidden');
+      });
+
+      closeChat.addEventListener('click', () => {
+          chatPopup.classList.add('hidden');
+          chatButton.classList.remove('hidden');
+      });
+
+      // Close chat when clicking outside
+      document.addEventListener('click', (e) => {
+          if (!chatPopup.contains(e.target) && !chatButton.contains(e.target)) {
+              chatPopup.classList.add('hidden');
+              chatButton.classList.remove('hidden');
+          }
+      });
+
+      // Bank comparison functionality
+      const bankComparison = document.getElementById('bankComparison');
+      const comparisonResults = document.getElementById('comparisonResults');
+      
+      // Store bank rates for easy access
+      const bankRates = {
+        sbi: 6.50,
+        hdfc: 6.75,
+        icici: 6.80,
+        axis: 6.85,
+        pnb: 6.40,
+        kotak: 6.70,
+        yes: 6.90,
+        idfc: 7.00,
+        post: 6.60,
+        nsc: 6.80,
+        kvp: 7.00,
+        sukanya: 7.60,
+        ppf: 7.10
+      };
+      
+      bankComparison.addEventListener('change', () => {
+        const selectedBank = bankComparison.value;
+        
+        if (!selectedBank) {
+          comparisonResults.classList.add('hidden');
+          return;
+        }
+        
+        // Get current calculation values
+        const principal = parseFloat(document.getElementById('principal').value) || 0;
+        const currentRate = parseFloat(document.getElementById('rate').value) || 0;
+        const timeInput = parseFloat(document.getElementById('time').value) || 0;
+        const type = document.getElementById('interestType').value;
+        const compounding = type === 'compound' ? parseInt(document.getElementById('compounding').value) : 1;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+        // Calculate time from dates if both dates are provided
+        let time = timeInput;
+        let exactDays = 0;
+        if (startDate && endDate) {
+          const startDateObj = new Date(startDate);
+          const endDateObj = new Date(endDate);
+          
+          // Check if end date is after start date
+          if (endDateObj <= startDateObj) {
+            alert("End date must be after start date");
+            document.getElementById('endDate').value = startDate;
+            return;
+          }
+          
+          // Calculate exact days between dates using UTC to avoid timezone issues
+          const startUTC = Date.UTC(startDateObj.getFullYear(), startDateObj.getMonth(), startDateObj.getDate());
+          const endUTC = Date.UTC(endDateObj.getFullYear(), endDateObj.getMonth(), endDateObj.getDate());
+          const diffTime = endUTC - startUTC;
+          exactDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // Add 1 to include both start and end dates
+          time = exactDays / 365; // Convert to years for calculation
+        }
+
+        if (principal <= 0 || time <= 0) {
+          comparisonResults.classList.add('hidden');
+          return;
+        }
+
+        // Get the selected bank's rate
+        const selectedRate = bankRates[selectedBank];
+        
+        // Calculate returns with current rate
+        let currentInterest, currentAmount;
+        if (type === 'simple') {
+          if (startDate && endDate) {
+            currentInterest = (principal * currentRate * exactDays) / (365 * 100);
+          } else {
+            currentInterest = (principal * currentRate * time) / 100;
+          }
+          currentAmount = principal + currentInterest;
+        } else {
+          if (startDate && endDate) {
+            const r = currentRate / 100;
+            const n = compounding;
+            const t = exactDays / 365;
+            currentAmount = principal * Math.pow(1 + (r / n), n * t);
+          } else {
+            const r = currentRate / 100;
+            currentAmount = principal * Math.pow(1 + (r / compounding), compounding * time);
+          }
+          currentInterest = currentAmount - principal;
+        }
+        
+        // Calculate returns with selected bank's rate
+        let selectedInterest, selectedAmount;
+        if (type === 'simple') {
+          if (startDate && endDate) {
+            selectedInterest = (principal * selectedRate * exactDays) / (365 * 100);
+          } else {
+            selectedInterest = (principal * selectedRate * time) / 100;
+          }
+          selectedAmount = principal + selectedInterest;
+        } else {
+          if (startDate && endDate) {
+            const r = selectedRate / 100;
+            const n = compounding;
+            const t = exactDays / 365;
+            selectedAmount = principal * Math.pow(1 + (r / n), n * t);
+          } else {
+            const r = selectedRate / 100;
+            selectedAmount = principal * Math.pow(1 + (r / compounding), compounding * time);
+          }
+          selectedInterest = selectedAmount - principal;
+        }
+        
+        // Calculate difference
+        const difference = selectedAmount - currentAmount;
+        
+        // Update comparison results
+        document.getElementById('selectedRate').textContent = `${selectedRate}%`;
+        document.getElementById('selectedInterest').textContent = formatCurrency(selectedInterest);
+        document.getElementById('selectedAmount').textContent = formatCurrency(selectedAmount);
+        
+        document.getElementById('currentRate').textContent = `${currentRate}%`;
+        document.getElementById('currentInterest').textContent = formatCurrency(currentInterest);
+        document.getElementById('currentAmount').textContent = formatCurrency(currentAmount);
+        
+        // Format difference with color based on whether it's positive or negative
+        const differenceElement = document.getElementById('differenceAmount');
+        if (difference > 0) {
+          differenceElement.textContent = `+${formatCurrency(difference)} (Better)`;
+          differenceElement.classList.add('text-green-600');
+          differenceElement.classList.remove('text-red-600');
+        } else if (difference < 0) {
+          differenceElement.textContent = `${formatCurrency(difference)} (Worse)`;
+          differenceElement.classList.add('text-red-600');
+          differenceElement.classList.remove('text-green-600');
+        } else {
+          differenceElement.textContent = formatCurrency(difference);
+          differenceElement.classList.remove('text-green-600', 'text-red-600');
+        }
+        
+        // Show comparison results
+        comparisonResults.classList.remove('hidden');
+      });
+    });
+  </script>
+
+</body>
+</html>
+
